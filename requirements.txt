@@ -5,3 +5,5 @@ openpyxl
 chardet
 python-dotenv
 python-docx
+fastapi
+uvicorn
