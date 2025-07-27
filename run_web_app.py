@@ -11,17 +11,22 @@ from pathlib import Path
 
 def check_dependencies():
     """必要な依存関係をチェック"""
-    required_packages = [
-        'flask', 'pandas', 'openpyxl', 'chardet', 
-        'python-dotenv', 'python-docx'
-    ]
+    # パッケージ名 → import名 の対応辞書に変更
+    required_packages = {
+        'flask': 'flask',
+        'pandas': 'pandas',
+        'openpyxl': 'openpyxl',
+        'chardet': 'chardet',
+        'python-dotenv': 'dotenv',
+        'python-docx': 'docx'
+    }
     
     missing_packages = []
-    for package in required_packages:
+    for pip_name, import_name in required_packages.items():
         try:
-            __import__(package.replace('-', '_'))
+            __import__(import_name)
         except ImportError:
-            missing_packages.append(package)
+            missing_packages.append(pip_name)
     
     if missing_packages:
         print(">> 以下のパッケージがインストールされていません:")
@@ -32,6 +37,7 @@ def check_dependencies():
         return False
     
     return True
+
 
 def main():
     """メイン関数"""
