@@ -1,21 +1,34 @@
-from flask import Flask, request, render_template
-from docx import Document
-import os
+from flask import Flask, request, jsonify, render_template
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # 必要ならCORS許可
 
-@app.route('/', methods=['GET'])
+@app.route('/')
 def index():
-    return render_template('index.html')
+    return render_template('index.html')  # 上記HTMLを templates/index.html に保存してください
 
-@app.route('/upload', methods=['POST'])
-def upload():
-    file = request.files['file']
-    if file and file.filename.endswith('.docx'):
-        document = Document(file)
-        full_text = '\n'.join([p.text for p in document.paragraphs])
-        return render_template('index.html', content=full_text)
-    return '対応していないファイル形式です', 400
+@app.route('/suggest', methods=['POST'])
+def suggest():
+    data = request.get_json()
+    text = data.get('text', '')
+
+    # ダミー校正ロジック：本来はLLM連携など
+    suggestions = []
+    if '致します' in text:
+        suggestions.append({
+            "original": "致します",
+            "suggestion": "いたします",
+            "reason": "敬語のひらがな表記が推奨されます"
+        })
+    if '下さい' in text:
+        suggestions.append({
+            "original": "下さい",
+            "suggestion": "ください",
+            "reason": "漢字の敬語は避け、ひらがなが推奨されます"
+        })
+
+    return jsonify({"suggestions": suggestions})
 
 if __name__ == "__main__":
     import os

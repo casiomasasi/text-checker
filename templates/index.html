@@ -1,19 +1,72 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
     <meta charset="UTF-8">
     <title>テキスト校正アプリ</title>
+    <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+    <style>
+        #editor-container {
+            height: 300px;
+            margin-bottom: 20px;
+        }
+        #suggestions {
+            border: 1px solid #ccc;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
 </head>
 <body>
     <h1>テキスト校正アプリ</h1>
-    <form method="POST" action="/upload" enctype="multipart/form-data">
-        <input type="file" name="file" accept=".docx" required>
+    <form id="upload-form" enctype="multipart/form-data">
+        <input type="file" id="file-input" name="file">
         <button type="submit">アップロード</button>
     </form>
 
-    {% if content %}
-        <h2>アップロードされた内容</h2>
-        <pre>{{ content }}</pre>
-    {% endif %}
+    <div id="editor-container"></div>
+    <button id="check-btn">AI校正を提案</button>
+
+    <h3>AIからの提案</h3>
+    <div id="suggestions"></div>
+
+    <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+    <script>
+        const quill = new Quill('#editor-container', {
+            theme: 'snow'
+        });
+
+        document.getElementById("check-btn").addEventListener("click", async () => {
+            const content = quill.getText();
+            const response = await fetch("/suggest", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ text: content })
+            });
+            const data = await response.json();
+            const suggestionsDiv = document.getElementById("suggestions");
+            suggestionsDiv.innerHTML = "";
+
+            data.suggestions.forEach((s, index) => {
+                const block = document.createElement("div");
+                block.innerHTML = `
+                    <p><strong>対象:</strong> ${s.original}</p>
+                    <p><strong>提案:</strong> ${s.suggestion}</p>
+                    <p><strong>理由:</strong> ${s.reason}</p>
+                    <button onclick="applySuggestion(${index})">反映</button>
+                    <hr>
+                `;
+                suggestionsDiv.appendChild(block);
+            });
+            window.suggestions = data.suggestions;
+        });
+
+        window.applySuggestion = function(index) {
+            const { original, suggestion } = window.suggestions[index];
+            const text = quill.getText();
+            const updated = text.replace(original, suggestion);
+            quill.setText(updated);
+        };
+    </script>
 </body>
 </html>
