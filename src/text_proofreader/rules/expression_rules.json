@@ -1,0 +1,80 @@
+{
+  "inappropriate_expressions": {
+    "discriminatory": {
+      "老人": {
+        "pattern": "老人",
+        "suggestion": "高齢者",
+        "severity": "high",
+        "description": "より適切な表現への変更を推奨"
+      }
+    },
+    "inappropriate_honorifics": {
+      "double_honorifics": {
+        "pattern": "お(読み|書き|聞き)になられる",
+        "suggestion": "お〜になる または 〜れる",
+        "severity": "medium",
+        "description": "二重敬語の使用"
+      },
+      "excessive_honorifics": {
+        "pattern": "お(忙しい|疲れ)様でございます",
+        "suggestion": "お疲れ様です",
+        "severity": "low",
+        "description": "過度な敬語表現"
+      }
+    },
+    "inappropriate_abbreviations": {
+      "business_casual": {
+        "pattern": "(了解|りょうかい|OK|オッケー)",
+        "suggestion": "承知いたしました",
+        "severity": "medium",
+        "description": "ビジネス文書では適切な敬語を使用"
+      }
+    },
+    "redundant_expressions": {
+      "can_do": {
+        "pattern": "することができる",
+        "suggestion": "できる",
+        "severity": "low",
+        "description": "冗長な表現の簡略化"
+      },
+      "in_case_of": {
+        "pattern": "の場合には",
+        "suggestion": "の場合は または には",
+        "severity": "low",
+        "description": "冗長な表現の簡略化"
+      }
+    }
+  },
+  "style_inconsistency": {
+    "formality_mixing": {
+      "keigo_joutai": {
+        "pattern": "です。.{0,50}だ。|である。.{0,50}です。",
+        "suggestion": "文体を統一",
+        "severity": "medium",
+        "description": "敬語と常体の混在"
+      }
+    },
+    "number_notation": {
+      "arabic_kanji_mix": {
+        "pattern": "([0-9]+)と([一二三四五六七八九十百千万]+)|([一二三四五六七八九十百千万]+)と([0-9]+)",
+        "suggestion": "数字表記の統一",
+        "severity": "low",
+        "description": "算用数字と漢数字の混在"
+      }
+    }
+  },
+  "word_choice": {
+    "vague_expressions": {
+      "pattern": "(なんか|なんとなく|だいたい|適当に)",
+      "suggestion": "具体的な表現",
+      "severity": "medium",
+      "description": "曖昧な表現の使用"
+    },
+    "filler_words": {
+      "pattern": "(えーと|あのー|まあ|とりあえず)",
+      "suggestion": "削除または具体的な表現",
+      "severity": "low",
+      "description": "フィラー語の使用"
+    }
+  }
+}

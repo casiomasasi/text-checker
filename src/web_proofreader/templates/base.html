@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}テキスト校正システム{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts (Noto Sans JP) -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
+    
+    {% block head %}{% endblock %}
+</head>
+<body>
+    <!-- ナビゲーションバー -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+        <div class="container">
+            <a class="navbar-brand" href="{{ url_for('index') }}">
+                <i class="fas fa-spell-check me-2"></i>
+                テキスト校正システム
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ url_for('index') }}">
+                            <i class="fas fa-home me-1"></i>ホーム
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <button class="btn btn-outline-light btn-sm" onclick="showKeyboardHelp()">
+                            <i class="fas fa-keyboard me-1"></i>キーボード操作
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- メインコンテンツ -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- フッター -->
+    <footer class="footer bg-light mt-auto py-3">
+        <div class="container text-center">
+            <span class="text-muted">
+                &copy; 2024 テキスト校正システム. All rights reserved.
+            </span>
+        </div>
+    </footer>
+
+    <!-- キーボード操作ヘルプモーダル -->
+    <div class="modal fade" id="keyboardHelpModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-keyboard me-2"></i>キーボード操作ガイド
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-12">
+                            <h6><i class="fas fa-comments me-2"></i>コメント操作</h6>
+                            <ul class="list-unstyled mb-3">
+                                <li><kbd>↑</kbd> <kbd>↓</kbd> - コメント間の移動</li>
+                                <li><kbd>Enter</kbd> - コメントの修正を適用</li>
+                                <li><kbd>Esc</kbd> - コメントを無視</li>
+                                <li><kbd>Tab</kbd> - 次のコメントに移動</li>
+                                <li><kbd>Shift</kbd> + <kbd>Tab</kbd> - 前のコメントに移動</li>
+                            </ul>
+                            
+                            <h6><i class="fas fa-edit me-2"></i>エディタ操作</h6>
+                            <ul class="list-unstyled mb-3">
+                                <li><kbd>Ctrl</kbd> + <kbd>Z</kbd> - 元に戻す</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>Y</kbd> - やり直し</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>S</kbd> - 保存</li>
+                                <li><kbd>Ctrl</kbd> + <kbd>A</kbd> - 全選択</li>
+                            </ul>
+                            
+                            <h6><i class="fas fa-download me-2"></i>その他</h6>
+                            <ul class="list-unstyled">
+                                <li><kbd>Ctrl</kbd> + <kbd>D</kbd> - ダウンロード</li>
+                                <li><kbd>F1</kbd> - このヘルプを表示</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loadingOverlay" class="loading-overlay d-none">
+        <div class="loading-content">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">読み込み中...</span>
+            </div>
+            <div class="loading-text mt-3">処理中...</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', filename='js/common.js') }}"></script>
+    
+    {% block scripts %}{% endblock %}
+
+    <script>
+        // キーボードヘルプモーダル表示
+        function showKeyboardHelp() {
+            const modal = new bootstrap.Modal(document.getElementById('keyboardHelpModal'));
+            modal.show();
+        }
+
+        // F1キーでヘルプ表示
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'F1') {
+                event.preventDefault();
+                showKeyboardHelp();
+            }
+        });
+
+        // ローディング表示制御
+        function showLoading(text = '処理中...') {
+            const overlay = document.getElementById('loadingOverlay');
+            const loadingText = overlay.querySelector('.loading-text');
+            loadingText.textContent = text;
+            overlay.classList.remove('d-none');
+        }
+
+        function hideLoading() {
+            const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.add('d-none');
+        }
+    </script>
+</body>
+</html>

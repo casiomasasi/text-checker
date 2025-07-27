@@ -1,0 +1,94 @@
+{
+  "context_consistency": {
+    "pronoun_reference": {
+      "ambiguous_pronouns": {
+        "pattern": "(これ|それ|あれ|この|その|あの)(?!は|が|を|に|で|から|まで|について|に関して)",
+        "check_type": "reference_clarity",
+        "severity": "medium",
+        "description": "代名詞の指示対象が不明確"
+      }
+    },
+    "tense_consistency": {
+      "mixed_tenses": {
+        "pattern": "(した|だった|である).*?(する|だ|である)",
+        "check_type": "tense_matching",
+        "severity": "medium",
+        "description": "文章内での時制の不整合"
+      }
+    },
+    "logical_flow": {
+      "conclusion_without_reason": {
+        "pattern": "(したがって|よって|ゆえに|そのため)(?![^。]*?(なぜなら|理由は|原因は))",
+        "check_type": "logical_connection",
+        "severity": "high",
+        "description": "結論に対する根拠が不明確"
+      },
+      "contradiction": {
+        "pattern": "(しかし|だが|けれども|ところが).*?(同じ|同様|同一)",
+        "check_type": "contradiction_check",
+        "severity": "high",
+        "description": "論理的矛盾の可能性"
+      }
+    },
+    "coherence": {
+      "topic_shift": {
+        "pattern": "。.*?(ところで|さて|話は変わって)",
+        "check_type": "topic_transition",
+        "severity": "low",
+        "description": "唐突な話題転換"
+      },
+      "repetitive_content": {
+        "pattern": "(.{10,}).*?\\1",
+        "check_type": "content_repetition",
+        "severity": "low",
+        "description": "内容の重複"
+      }
+    }
+  },
+  "structure_issues": {
+    "paragraph_structure": {
+      "long_sentences": {
+        "pattern": "[^。]{100,}。",
+        "check_type": "sentence_length",
+        "severity": "medium",
+        "description": "文が長すぎる（100文字以上）"
+      },
+      "short_paragraphs": {
+        "pattern": "^.{1,20}$",
+        "check_type": "paragraph_length",
+        "severity": "low",
+        "description": "段落が短すぎる"
+      }
+    },
+    "punctuation": {
+      "missing_periods": {
+        "pattern": "[^。！？]\\n",
+        "check_type": "punctuation_check",
+        "severity": "medium",
+        "description": "文末の句点が不足"
+      },
+      "excessive_punctuation": {
+        "pattern": "[。！？]{2,}",
+        "check_type": "punctuation_check",
+        "severity": "low",
+        "description": "句点・感嘆符の過度な使用"
+      }
+    }
+  },
+  "readability": {
+    "complexity": {
+      "difficult_kanji": {
+        "pattern": "[一-龯]{5,}",
+        "check_type": "readability",
+        "severity": "low",
+        "description": "漢字の連続が多い（読みにくい）"
+      },
+      "katakana_overuse": {
+        "pattern": "[ア-ン]{10,}",
+        "check_type": "readability",
+        "severity": "low",
+        "description": "カタカナの連続が多い"
+      }
+    }
+  }
+}

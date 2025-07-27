@@ -1,0 +1,179 @@
+{% extends "base.html" %}
+
+{% block title %}ファイルアップロード - テキスト校正システム{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <!-- ヘッダー -->
+            <div class="text-center mb-5">
+                <h1 class="display-5 fw-bold text-primary">
+                    <i class="fas fa-spell-check me-3"></i>
+                    テキスト校正システム
+                </h1>
+                <p class="lead text-muted">
+                    Wordファイルをアップロードして、誤字脱字や不適切な表現を自動検出・修正できます
+                </p>
+            </div>
+
+            <!-- 機能紹介 -->
+            <div class="row mb-5">
+                <div class="col-md-4 text-center mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-search fa-2x text-danger"></i>
+                    </div>
+                    <h5 class="mt-3">誤字脱字チェック</h5>
+                    <p class="text-muted small">ひらがな・カタカナの誤用、漢字変換ミス、タイプミスを検出</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-exclamation-triangle fa-2x text-warning"></i>
+                    </div>
+                    <h5 class="mt-3">不適切表現チェック</h5>
+                    <p class="text-muted small">差別的表現、敬語の誤用、口語表現を検出</p>
+                </div>
+                <div class="col-md-4 text-center mb-3">
+                    <div class="feature-icon">
+                        <i class="fas fa-link fa-2x text-info"></i>
+                    </div>
+                    <h5 class="mt-3">文脈整合性チェック</h5>
+                    <p class="text-muted small">代名詞の指示対象、時制の不整合、論理的矛盾を検出</p>
+                </div>
+            </div>
+
+            <!-- ファイルアップロードエリア -->
+            <div class="card shadow-lg">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-upload me-2"></i>
+                        Wordファイルアップロード
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <!-- ドラッグ&ドロップエリア -->
+                    <div id="dropzone" class="dropzone mb-3">
+                        <div class="dropzone-content">
+                            <i class="fas fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+                            <h5>ファイルをここにドラッグ&ドロップ</h5>
+                            <p class="text-muted">または下のボタンでファイルを選択してください</p>
+                            <div class="upload-info">
+                                <small class="text-muted">
+                                    <i class="fas fa-info-circle me-1"></i>
+                                    対応形式: .docx, .doc (最大10MB)
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ファイル選択ボタン -->
+                    <div class="text-center">
+                        <input type="file" id="fileInput" accept=".docx,.doc" class="d-none">
+                        <button type="button" class="btn btn-primary btn-lg" onclick="document.getElementById('fileInput').click()">
+                            <i class="fas fa-folder-open me-2"></i>
+                            ファイルを選択
+                        </button>
+                    </div>
+
+                    <!-- アップロード進捗 -->
+                    <div id="uploadProgress" class="mt-3 d-none">
+                        <div class="progress">
+                            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" 
+                                 role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <div class="text-center mt-2">
+                            <small id="progressText" class="text-muted">アップロード中...</small>
+                        </div>
+                    </div>
+
+                    <!-- エラーメッセージ -->
+                    <div id="errorMessage" class="alert alert-danger mt-3 d-none">
+                        <i class="fas fa-exclamation-circle me-2"></i>
+                        <span id="errorText"></span>
+                    </div>
+
+                    <!-- 成功メッセージ -->
+                    <div id="successMessage" class="alert alert-success mt-3 d-none">
+                        <i class="fas fa-check-circle me-2"></i>
+                        <span id="successText"></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 使用方法 -->
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        使用方法
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <ol class="mb-0">
+                        <li class="mb-2">
+                            <strong>ファイルアップロード:</strong> 
+                            Wordファイルをドラッグアンドドロップするか、「ファイルを選択」ボタンでアップロード
+                        </li>
+                        <li class="mb-2">
+                            <strong>校正処理:</strong> 
+                            システムが自動的に誤字脱字、不適切表現、文脈の問題を検出
+                        </li>
+                        <li class="mb-2">
+                            <strong>結果確認:</strong> 
+                            Googleドキュメント風のエディタで校正結果をインタラクティブに確認
+                        </li>
+                        <li>
+                            <strong>修正適用:</strong> 
+                            コメントをクリックまたはEnterキーで修正を適用、完了後にダウンロード
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <!-- サンプルファイル -->
+            <div class="text-center mt-4">
+                <p class="text-muted">
+                    <i class="fas fa-file-word me-1"></i>
+                    サンプルファイルをお持ちでない場合は、
+                    <a href="#" class="text-decoration-none" onclick="createSampleFile()">
+                        サンプルWordファイルをダウンロード
+                    </a>
+                    してお試しください
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/upload.js') }}"></script>
+
+<script>
+    // サンプルファイル作成
+    function createSampleFile() {
+        const sampleText = `私わ学生です。これから大学で勉強をすることができると思います。
+
+記憶を取るために、ノートに重要なポイントを書き留めました。しかし、書いた内容を見返すと、何を書いたかよく覚えていません。
+
+今日の授業わとても面白かったです。先生の説明がわかりやすく、理解することができました。でも、これは本当に難しい内容だと思う。
+
+一つづつ丁寧に学習していけば、きっと上達するでしょう。老人の方々も同じように努力されています。
+
+了解しました。明日も頑張って勉強します。`;
+        
+        // テキストファイルとしてダウンロード
+        const blob = new Blob([sampleText], { type: 'text/plain;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'sample_text.txt';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        
+        alert('サンプルテキストファイルをダウンロードしました。\\n実際のテストには.docx形式のファイルをご用意ください。');
+    }
+</script>
+{% endblock %}

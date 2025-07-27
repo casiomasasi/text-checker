@@ -1,0 +1,292 @@
+{% extends "base.html" %}
+
+{% block title %}テキストエディタ - テキスト校正システム{% endblock %}
+
+{% block head %}
+<style>
+    .editor-container {
+        height: calc(100vh - 200px);
+        min-height: 600px;
+    }
+    
+    .editor-sidebar {
+        background-color: #f8f9fa;
+        border-left: 1px solid #dee2e6;
+        overflow-y: auto;
+    }
+    
+    .editor-content {
+        background-color: white;
+        border: 1px solid #dee2e6;
+        overflow-y: auto;
+        font-family: 'Noto Sans JP', sans-serif;
+        line-height: 1.6;
+        padding: 20px;
+    }
+    
+    .text-highlight {
+        position: relative;
+        cursor: pointer;
+        border-radius: 3px;
+        padding: 1px 2px;
+        transition: all 0.2s ease;
+    }
+    
+    .text-highlight.severity-high {
+        background-color: rgba(220, 53, 69, 0.2);
+        border-bottom: 2px solid #dc3545;
+    }
+    
+    .text-highlight.severity-medium {
+        background-color: rgba(255, 193, 7, 0.2);
+        border-bottom: 2px solid #ffc107;
+    }
+    
+    .text-highlight.severity-low {
+        background-color: rgba(13, 202, 240, 0.2);
+        border-bottom: 2px solid #0dcaf0;
+    }
+    
+    .text-highlight:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .text-highlight.active {
+        background-color: rgba(13, 110, 253, 0.3);
+        border-bottom: 2px solid #0d6efd;
+    }
+    
+    .comment-card {
+        border: none;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .comment-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .comment-card.active {
+        border: 2px solid #0d6efd;
+        transform: translateY(-2px);
+    }
+    
+    .comment-card.applied {
+        opacity: 0.6;
+        background-color: #f8f9fa;
+    }
+    
+    .severity-badge {
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .apply-button {
+        transition: all 0.2s ease;
+    }
+    
+    .apply-button:hover {
+        transform: scale(1.05);
+    }
+    
+    .toolbar {
+        background-color: white;
+        border-bottom: 1px solid #dee2e6;
+        padding: 10px 15px;
+    }
+    
+    .progress-indicator {
+        background-color: #e9ecef;
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+    
+    .progress-bar-custom {
+        background: linear-gradient(90deg, #28a745, #ffc107, #dc3545);
+        height: 100%;
+        transition: width 0.3s ease;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid h-100">
+    <!-- ツールバー -->
+    <div class="toolbar">
+        <div class="row align-items-center">
+            <div class="col-md-6">
+                <div class="d-flex align-items-center">
+                    <button class="btn btn-outline-secondary btn-sm me-2" onclick="goBack()">
+                        <i class="fas fa-arrow-left me-1"></i>戻る
+                    </button>
+                    <div class="file-info">
+                        <strong id="fileName">ファイル名</strong>
+                        <small class="text-muted ms-2" id="fileStats">0文字 / 0コメント</small>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 text-end">
+                <div class="btn-group me-2" role="group">
+                    <button class="btn btn-outline-primary btn-sm" onclick="applyAllComments()" id="applyAllBtn">
+                        <i class="fas fa-check-double me-1"></i>全て適用
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" onclick="downloadDocument()">
+                        <i class="fas fa-download me-1"></i>ダウンロード
+                    </button>
+                </div>
+                <button class="btn btn-outline-info btn-sm" onclick="showKeyboardHelp()">
+                    <i class="fas fa-keyboard me-1"></i>操作方法
+                </button>
+            </div>
+        </div>
+        
+        <!-- 進捗インジケーター -->
+        <div class="mt-2">
+            <div class="row align-items-center">
+                <div class="col-md-8">
+                    <div class="progress-indicator">
+                        <div class="progress-bar-custom" id="progressBar" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="col-md-4 text-end">
+                    <small class="text-muted">
+                        <span id="appliedCount">0</span> / <span id="totalCount">0</span> 適用済み
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- メインエディタエリア -->
+    <div class="row editor-container">
+        <!-- テキストエディタ -->
+        <div class="col-md-8 p-0">
+            <div class="editor-content h-100" id="textEditor" tabindex="0">
+                <!-- テキストがここに表示される -->
+            </div>
+        </div>
+        
+        <!-- コメントサイドバー -->
+        <div class="col-md-4 p-0">
+            <div class="editor-sidebar h-100">
+                <div class="p-3">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0">
+                            <i class="fas fa-comments me-2"></i>校正コメント
+                        </h6>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button class="btn btn-outline-secondary" onclick="filterComments('all')" id="filterAll">
+                                全て
+                            </button>
+                            <button class="btn btn-outline-secondary" onclick="filterComments('unapplied')" id="filterUnapplied">
+                                未適用
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- コメント一覧 -->
+                    <div id="commentsList">
+                        <!-- コメントがここに表示される -->
+                    </div>
+                    
+                    <!-- コメントなしの場合 -->
+                    <div id="noComments" class="text-center text-muted py-4 d-none">
+                        <i class="fas fa-check-circle fa-2x mb-2"></i>
+                        <p>校正コメントはありません</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 修正確認モーダル -->
+<div class="modal fade" id="confirmModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">修正の確認</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p><strong>修正箇所:</strong></p>
+                <div class="bg-light p-2 rounded mb-3">
+                    <del class="text-danger" id="originalText"></del>
+                </div>
+                <p><strong>修正案:</strong></p>
+                <div class="bg-light p-2 rounded mb-3">
+                    <ins class="text-success" id="suggestionText"></ins>
+                </div>
+                <p><strong>説明:</strong></p>
+                <p class="text-muted" id="descriptionText"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">キャンセル</button>
+                <button type="button" class="btn btn-primary" onclick="confirmApply()">修正を適用</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/editor.js') }}"></script>
+<script src="{{ url_for('static', filename='js/comments.js') }}"></script>
+<script src="{{ url_for('static', filename='js/keyboard.js') }}"></script>
+
+<script>
+    // セッションIDを取得
+    const sessionId = '{{ session_id }}';
+    
+    // ページ読み込み時の初期化
+    document.addEventListener('DOMContentLoaded', function() {
+        loadDocument();
+    });
+    
+    // 戻るボタン
+    function goBack() {
+        if (confirm('編集中の内容が失われる可能性があります。本当に戻りますか？')) {
+            window.location.href = '/';
+        }
+    }
+    
+    // ドキュメントダウンロード
+    function downloadDocument() {
+        const link = document.createElement('a');
+        link.href = `/api/download/${sessionId}`;
+        link.download = `proofread_document.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+    // 全コメント適用
+    function applyAllComments() {
+        const unappliedComments = comments.filter(c => !c.applied);
+        if (unappliedComments.length === 0) {
+            alert('適用可能なコメントがありません。');
+            return;
+        }
+        
+        if (confirm(`${unappliedComments.length}件の修正を全て適用しますか？`)) {
+            unappliedComments.forEach(comment => {
+                applyComment(comment.id, false); // 確認なしで適用
+            });
+        }
+    }
+    
+    // ページ離脱時の確認
+    window.addEventListener('beforeunload', function(e) {
+        const unappliedCount = comments.filter(c => !c.applied).length;
+        if (unappliedCount > 0) {
+            e.preventDefault();
+            e.returnValue = '未適用の修正があります。ページを離れますか？';
+            return e.returnValue;
+        }
+    });
+</script>
+{% endblock %}

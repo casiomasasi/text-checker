@@ -1,0 +1,58 @@
+{
+  "hiragana_katakana_errors": {
+    "わ_は": {
+      "pattern": "(私|僕|彼|彼女)わ",
+      "correction": "は",
+      "description": "助詞「は」を「わ」と書いている",
+      "examples": ["私わ学生です → 私は学生です"]
+    },
+    "ずつ_づつ": {
+      "pattern": "一つづつ|ひとつづつ",
+      "correction": "ずつ",
+      "description": "「ずつ」を「づつ」と書いている",
+      "examples": ["一つづつ → 一つずつ"]
+    }
+  },
+  "kanji_conversion_errors": {
+    "記録_記憶": {
+      "pattern": "記憶を(取る|残す|付ける)",
+      "correction": "記録",
+      "description": "「記録」を「記憶」と誤変換",
+      "examples": ["記憶を取る → 記録を取る"]
+    },
+    "以外_意外": {
+      "pattern": "意外は|意外に(も|は)",
+      "correction": "以外",
+      "description": "「以外」を「意外」と誤変換",
+      "examples": ["それ意外は → それ以外は"]
+    }
+  },
+  "typing_errors": {
+    "duplicate_chars": {
+      "pattern": "([あ-ん])\\1{2,}|([ア-ン])\\2{2,}|([a-zA-Z])\\3{2,}",
+      "correction": "重複文字の削除",
+      "description": "同じ文字の不適切な重複",
+      "examples": ["あああり → あり", "すすすみ → すみ"]
+    },
+    "adjacent_key_errors": {
+      "pattern": "([qwertyuiop])([asdfghjkl])|([asdfghjkl])([zxcvbnm])",
+      "correction": "隣接キーの誤入力",
+      "description": "キーボードの隣接キー誤入力",
+      "examples": ["こんにちわ → こんにちは"]
+    }
+  },
+  "okurigana_errors": {
+    "okonau": {
+      "pattern": "行なう",
+      "correction": "行う",
+      "description": "送り仮名の表記揺れ",
+      "examples": ["行なう → 行う"]
+    },
+    "toriatsukai": {
+      "pattern": "取扱い",
+      "correction": "取り扱い",
+      "description": "送り仮名の省略",
+      "examples": ["取扱い → 取り扱い"]
+    }
+  }
+}
