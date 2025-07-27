@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>テキスト校正アプリ</title>
+</head>
+<body>
+    <h1>テキスト校正アプリ</h1>
+    <form method="POST" action="/upload" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".docx" required>
+        <button type="submit">アップロード</button>
+    </form>
+
+    {% if content %}
+        <h2>アップロードされた内容</h2>
+        <pre>{{ content }}</pre>
+    {% endif %}
+</body>
+</html>
