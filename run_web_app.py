@@ -13,7 +13,7 @@ def check_dependencies():
         'python-dotenv': 'dotenv',
         'python-docx': 'docx'
     }
-    
+
     missing_packages = []
     for pip_name, import_name in required_packages.items():
         try:
